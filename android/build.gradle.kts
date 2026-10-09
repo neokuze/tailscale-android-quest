@@ -51,6 +51,18 @@ android {
   flavorDimensions += "version"
   namespace = "com.tailscale.ipn"
 
+  val questKeystore = getLocalProperty("questKeystore", "")
+  if (questKeystore.isNotEmpty()) {
+    signingConfigs {
+      create("quest") {
+        storeFile = file(questKeystore)
+        storePassword = getLocalProperty("questKeystorePW", "")
+        keyAlias = getLocalProperty("questKeyAlias", "")
+        keyPassword = getLocalProperty("questKeyPW", "")
+      }
+    }
+  }
+
   buildTypes {
     debug { manifestPlaceholders["leanbackRequired"] = isTV() }
 
@@ -58,6 +70,7 @@ android {
       manifestPlaceholders["leanbackRequired"] = isTV()
       isMinifyEnabled = true
       isShrinkResources = true
+      if (questKeystore.isNotEmpty()) signingConfig = signingConfigs.getByName("quest")
 
       proguardFiles(
           getDefaultProguardFile("proguard-android-optimize.txt"),
